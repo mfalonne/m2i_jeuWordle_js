@@ -36,21 +36,35 @@ const initBoard = () => {
 document.addEventListener("keydown", function (event) {
   const key = event.key; // on récupère la touche saisie
 
-  // Si la touche est une lettre (on filtre avec une regex) et le nombre de lettre saisie est inférieur au nombre de lettre deviné
-  if (/^[a-zA-Z]$/.test(key) && currentGuess.length < word.length) {
-    const letter = key.toUpperCase(); // On ajoute la lettre en majuscule
-    //updateCase(ligne,case,lettre)
-    updateCase(currentTry, currentGuess.length, letter);
-    currentGuess += letter;
+  // Si la touche est une lettre (on filtre avec une regex)
+  if (/^[a-zA-Z]$/.test(key)) {
+    addLetter(key);
   }
 
-  // Si la touche est 'Backspace', on enlève la dernière lettre
   if (key === "Backspace") {
-    currentGuess = currentGuess.slice(0, -1);
-    clearCase(currentTry, currentGuess.length);
+    handleBackspace(key);
   }
+
   keyEnter(key);
 });
+
+//Ajouter la lettre
+const addLetter = (letter) => {
+  //Si le nombre de lettre saisie est inférieur au nombre de lettre deviné
+  if (currentGuess.length < word.length) {
+    const upper = letter.toUpperCase(); // On ajoute la lettre en majuscule
+    //updateCase(ligne,case,lettre)
+    updateCase(currentTry, currentGuess.length, upper);
+    currentGuess += upper;
+  }
+};
+
+//Supprimer la lettre
+
+const handleBackspace = () => {
+  currentGuess = currentGuess.slice(0, -1); // Si la touche est 'Backspace', on enlève la dernière lettre
+  clearCase(currentTry, currentGuess.length);
+};
 
 /*5.***************fonction qui gère la validation en appuyant sur la touche Enter**********/
 
@@ -120,7 +134,7 @@ const keyEnter = (key) => {
       : "Plus d'essais ! Le mot était : " + word;
 
   divValidate.appendChild(spanValidate);
-  createReplayButton();
+  //   createReplayButton();
 
   //on passe à la ligne suivante
   currentTry++;
@@ -154,10 +168,6 @@ const clearCase = (lineIndex, letterIndex) => {
   caseSpan.textContent = "";
 };
 
-window.onload = () => {
-  initBoard();
-};
-
 //bouton rejouer
 
 const createReplayButton = () => {
@@ -172,4 +182,52 @@ const createReplayButton = () => {
   });
 
   divValidate.appendChild(replayButton);
+};
+
+//Ajout de clavier virtuel
+
+const createVirtualKeyboard = () => {
+  const div = document.getElementById("keyboard");
+
+  const keyboard = [
+    ["A", "Z", "E", "R", "T", "Y", "U", "I", "O", "P"],
+    ["Q", "S", "D", "F", "G", "H", "J", "K", "L", "M"],
+    ["←", "W", "X", "C", "V", "B", "N", "ENTER"],
+  ];
+
+  keyboard.forEach((row) => {
+    const rowDiv = document.createElement("div");
+    rowDiv.classList.add("keyboard-row");
+
+    row.forEach((key) => {
+      const button = document.createElement("button");
+      button.textContent = key;
+      button.classList.add("key");
+
+      button.addEventListener("click", () => {
+        if (key === "←") {
+          handleBackspace();
+        } else if (key === "ENTER") {
+          keyEnter("Enter");
+        } else {
+          addLetter(key);
+        }
+      });
+
+      rowDiv.appendChild(button);
+    });
+
+    div.appendChild(rowDiv);
+  });
+};
+
+//fonction qui gère les clic du button
+
+const handleVirtualKey = (key) => {
+  return keyEnter(key);
+};
+
+window.onload = () => {
+  initBoard();
+  createVirtualKeyboard();
 };

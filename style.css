@@ -45,3 +45,19 @@
   color: white;
   border: none;
 }
+/*clavier*/
+
+#keyboard {
+  margin-top: 100px;
+  text-align: center;
+}
+.keyboard-row {
+  margin: 5px 0;
+}
+.key {
+  padding: 10px;
+  margin: 3px;
+  min-width: 30px;
+  font-size: 16px;
+  cursor: pointer;
+}
