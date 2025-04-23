@@ -21,7 +21,7 @@ const getData = async () => {
   const meal = data.meals[0];
 
   word = meal.strArea.toUpperCase();
-  // console.log(word);
+  console.log(word);
 
   const plat = {
     name: meal.strMeal,
@@ -85,6 +85,24 @@ document.addEventListener("keydown", function (event) {
   }
 
   keyEnter(key);
+
+  //Relier le clasier physique au clavier virtuel
+  const keyPressed = key.toUpperCase();
+  const virtualKeys = document.querySelectorAll(".key");
+
+  virtualKeys.forEach((btn) => {
+    if (
+      btn.textContent === keyPressed ||
+      (keyPressed === "BACKSPACE" && btn.textContent === "←") ||
+      (keyPressed === "ENTER" && btn.textContent === "ENTER")
+    ) {
+      btn.classList.add("active");
+
+      setTimeout(() => {
+        btn.classList.remove("active");
+      }, 100);
+    }
+  });
 });
 
 //Ajouter la lettre
@@ -123,6 +141,7 @@ const keyEnter = (key) => {
 
   const divValidate = document.getElementById("validate");
   const spanValidate = document.createElement("span");
+  spanValidate.style.margin = "10px";
   divValidate.innerHTML = ""; // on le vide au cas où
 
   // 1. Vérifier la longueur du mot saisi
@@ -137,6 +156,7 @@ const keyEnter = (key) => {
     if (guess[i] === secret[i]) {
       //colorie la ligne et colonne actuel en vert
       colorCase(currentTry, i, "green");
+      colorVirtualKey(guess[i], "green");
       checked[i] = true;
       secret[i] = null; //la lettre passe à null dans le tableau pour ne pas la retraité
       guess[i] = null;
@@ -150,18 +170,21 @@ const keyEnter = (key) => {
       const pos = secret.indexOf(guess[i]);
       if (pos !== -1) {
         colorCase(currentTry, i, "orange");
+        colorVirtualKey(guess[i], "orange");
         secret[pos] = null;
       } else {
         colorCase(currentTry, i, "red");
+        colorVirtualKey(guess[i], "red");
       }
     }
   }
 
   // 3. Vérification du mot
   if (currentGuess === word) {
-    spanValidate.textContent = "Bravo ! Vous avez trouvé le pays : " + word;
-    divValidate.appendChild(spanValidate);
-    createReplayButton();
+    // spanValidate.textContent = "Bravo ! Vous avez trouvé le pays : " + word;
+    // divValidate.appendChild(spanValidate);
+    // createReplayButton();
+    showModal(word);
     return;
   }
 
@@ -199,6 +222,29 @@ const colorCase = (lineIndex, letterIndex, color) => {
   span.style.color = "white"; // pour bien voir la lettre
 };
 
+//coloration de clavier virtuel
+const colorVirtualKey = (letter, color) => {
+  const keys = document.querySelectorAll(".key");
+
+  keys.forEach((key) => {
+    // on ignore si ce n'est pas la lettre concernée
+    if (key.textContent !== letter) return;
+
+    // priorité de couleurs : vert > orange > rouge
+    const currentColor = key.style.backgroundColor;
+
+    if (
+      currentColor === "green" ||
+      (currentColor === "orange" && color === "red")
+    ) {
+      return; // ne pas écraser le vert ou orange avec du rouge
+    }
+
+    key.style.backgroundColor = color;
+    key.style.color = "white";
+  });
+};
+
 //suppression des lettres
 const clearCase = (lineIndex, letterIndex) => {
   const board = document.getElementById("board");
@@ -212,7 +258,7 @@ const clearCase = (lineIndex, letterIndex) => {
 const createReplayButton = () => {
   const divValidate = document.getElementById("validate");
   const replayButton = document.createElement("button");
-  replayButton.textContent = "Rejouer";
+  replayButton.textContent = "REJOUER";
   replayButton.classList.add("btn");
 
   // Quand on clique, on recharge la page
@@ -263,10 +309,29 @@ const createVirtualKeyboard = () => {
   });
 };
 
-//fonction qui gère les clic du button
+// Ajout de modal
 
-const handleVirtualKey = (key) => {
-  return keyEnter(key);
+const showModal = (word) => {
+  const modal = document.getElementById("winModal");
+  const text = document.getElementById("modalText");
+  const closeBtn = document.getElementById("closeModal");
+  // const playAgainBtn = document.getElementById("playAgain");
+
+  text.textContent = `Vous avez trouvé : ${word}`;
+
+  modal.style.display = "block";
+
+  closeBtn.onclick = () => {
+    modal.style.display = "none";
+  };
+
+  createReplayButton();
+
+  window.onclick = (event) => {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  };
 };
 
 window.onload = () => {
