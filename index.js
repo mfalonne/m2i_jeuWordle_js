@@ -1,17 +1,56 @@
+/*****************Avec un tableau statique***********************/
 //1. Stocker une **liste de mots** dans un tableau.
-const wordList = ["PLAGE", "RIVET", "MONDE", "TARIF", "BOULE"];
+// const wordList = ["PLAGE", "RIVET", "MONDE", "TARIF", "BOULE"];
 
 //2. Sélectionner **un mot aléatoirement** dans ce tableau.
-const word = wordList[Math.floor(Math.random() * wordList.length)];
+// const word = wordList[Math.floor(Math.random() * wordList.length)];
 // console.log(word);
-
+/********************************************************************************* */
+const BASE_URL = `https://www.themealdb.com/api/json/v1/1/random.php`;
+let word = "";
 //3. Initialiser le **nombre d’essais à 5**.
 let maxTries = 5; //nombre d'esaie autoriser
 
 let currentGuess = ""; //stocke le mot que l'utilisateur est entrain d'ecrire
 let currentTry = 0; //stocke le nombre d'essaie. on commence à 0
 
-//au depart
+//Recuperation des données
+const getData = async () => {
+  const response = await fetch(`${BASE_URL}`);
+  const data = await response.json();
+  const meal = data.meals[0];
+
+  word = meal.strArea.toUpperCase();
+  // console.log(word);
+
+  const plat = {
+    name: meal.strMeal,
+    image: meal.strMealThumb,
+    origine: meal.strArea,
+  };
+  displayPlat(plat);
+  initBoard();
+};
+
+//Afficher les données
+
+const displayPlat = (plat) => {
+  const divGuess = document.getElementById("guessOriginOfPlat");
+  const divName = document.createElement("div");
+  divName.textContent = plat.name;
+  divName.style.fontSize = "20px";
+  divName.style.fontWeight = "bold";
+
+  const img = document.createElement("img");
+  img.src = plat.image;
+  img.alt = plat.name;
+  img.style.maxWidth = "200px";
+
+  divGuess.appendChild(divName);
+  divGuess.appendChild(img);
+};
+
+//Initialisation des données à l'arriver de la page
 
 const initBoard = () => {
   const board = document.getElementById("board");
@@ -120,7 +159,7 @@ const keyEnter = (key) => {
 
   // 3. Vérification du mot
   if (currentGuess === word) {
-    spanValidate.textContent = "Bravo ! Vous avez trouvé le mot : " + word;
+    spanValidate.textContent = "Bravo ! Vous avez trouvé le pays : " + word;
     divValidate.appendChild(spanValidate);
     createReplayButton();
     return;
@@ -206,10 +245,13 @@ const createVirtualKeyboard = () => {
 
       button.addEventListener("click", () => {
         if (key === "←") {
+          button.classList.add("backspace", "key");
           handleBackspace();
         } else if (key === "ENTER") {
+          button.classList.add("key", "enter");
           keyEnter("Enter");
         } else {
+          button.classList.add("key");
           addLetter(key);
         }
       });
@@ -228,6 +270,6 @@ const handleVirtualKey = (key) => {
 };
 
 window.onload = () => {
-  initBoard();
+  getData();
   createVirtualKeyboard();
 };

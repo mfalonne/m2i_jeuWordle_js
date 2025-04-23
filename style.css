@@ -54,10 +54,52 @@
 .keyboard-row {
   margin: 5px 0;
 }
-.key {
+/* .key {
   padding: 10px;
   margin: 3px;
   min-width: 30px;
   font-size: 16px;
   cursor: pointer;
+} */
+
+.key {
+  padding: 10px 15px;
+  margin: 4px;
+  font-size: 18px;
+  border-radius: 6px;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.key:hover {
+  background-color: #ccc;
+}
+
+.backspace {
+  background-color: #f44336;
+  color: white;
+  font-weight: bold;
+}
+
+.enter {
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+}
+/********************/
+
+.guess {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  gap: 60px;
+}
+#guessOriginOfPlat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
